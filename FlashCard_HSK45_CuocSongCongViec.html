@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>闪卡练习 · HSK 4–5 · 工作与生活</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #F7F4EF;
+    --surface: #FFFFFF;
+    --ink: #1A1A2E;
+    --ink-soft: #5A5A72;
+    --ink-faint: #9A9AB0;
+    --hsk4: #2D6A4F;
+    --hsk4-bg: #D8F3DC;
+    --hsk5: #9B4507;
+    --hsk5-bg: #FDEBD0;
+    --hsk6: #4A1D8C;
+    --hsk6-bg: #EDE7FF;
+    --accent: #2D6A4F;
+    --border: #E4E0D8;
+    --shadow: 0 2px 12px rgba(26,26,46,.08);
+    --shadow-hover: 0 8px 32px rgba(26,26,46,.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 24px 16px 48px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    max-width: 680px;
+    margin: 0 auto 32px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .header-left h1 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+  .header-left p {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+  .header-stats {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .stat-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .stat-pill span { color: var(--ink); font-weight: 600; }
+
+  /* ── FILTERS ── */
+  .filters {
+    max-width: 680px;
+    margin: 0 auto 20px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .filter-btn.hsk4.active { background: var(--hsk4); border-color: var(--hsk4); }
+  .filter-btn.hsk5.active { background: var(--hsk5); border-color: var(--hsk5); }
+  .filter-btn.hsk6.active { background: var(--hsk6); border-color: var(--hsk6); }
+
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    max-width: 680px;
+    margin: 0 auto 24px;
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width .4s ease;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--ink-faint);
+    margin-top: 6px;
+  }
+
+  /* ── CARD SCENE ── */
+  .card-scene {
+    max-width: 680px;
+    margin: 0 auto 20px;
+    perspective: 1000px;
+    cursor: pointer;
+  }
+  .card-inner {
+    position: relative;
+    width: 100%;
+    min-height: 280px;
+    transform-style: preserve-3d;
+    transition: transform .5s cubic-bezier(.4,0,.2,1);
+  }
+  .card-inner.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 28px;
+    min-height: 280px;
+  }
+  .card-face.back { transform: rotateY(180deg); }
+
+  .card-scene:hover .card-face { box-shadow: var(--shadow-hover); }
+
+  /* Front */
+  .card-level-tag {
+    position: absolute;
+    top: 18px;
+    left: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .tag-hsk4 { background: var(--hsk4-bg); color: var(--hsk4); }
+  .tag-hsk5 { background: var(--hsk5-bg); color: var(--hsk5); }
+  .tag-hsk6 { background: var(--hsk6-bg); color: var(--hsk6); }
+
+  .card-num {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    font-size: 12px;
+    color: var(--ink-faint);
+    font-weight: 500;
+  }
+
+  .flip-hint {
+    position: absolute;
+    bottom: 16px;
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+
+  .front-cn {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 52px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.1;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .front-py {
+    font-size: 18px;
+    color: var(--ink-soft);
+    letter-spacing: .04em;
+    margin-bottom: 6px;
+  }
+  .front-vn {
+    font-size: 14px;
+    color: var(--ink-faint);
+  }
+
+  /* Back */
+  .back-cn {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  .back-py { font-size: 14px; color: var(--ink-soft); margin-bottom: 20px; }
+  .back-desc {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.7;
+    text-align: center;
+    max-width: 480px;
+    margin-bottom: 16px;
+  }
+  .back-divider {
+    width: 40px;
+    height: 1px;
+    background: var(--border);
+    margin: 0 auto 16px;
+  }
+  .back-example {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 12px 16px;
+    width: 100%;
+    max-width: 480px;
+  }
+  .back-ex-cn {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 15px;
+    color: var(--ink);
+    line-height: 1.6;
+    margin-bottom: 4px;
+  }
+  .back-ex-vn {
+    font-size: 12px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* ── CONTROLS ── */
+  .controls {
+    max-width: 680px;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .ctrl-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s;
+    color: var(--ink);
+  }
+  .ctrl-btn:hover { border-color: var(--ink); box-shadow: var(--shadow); }
+  .ctrl-btn:disabled { opacity: .35; cursor: not-allowed; }
+  .ctrl-btn.primary {
+    width: 56px;
+    height: 56px;
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+    font-size: 20px;
+  }
+  .ctrl-btn.primary:hover { background: #2D2D4E; }
+
+  /* Know / Don't know */
+  .know-btns {
+    max-width: 680px;
+    margin: 0 auto 32px;
+    display: flex;
+    gap: 10px;
+  }
+  .know-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .know-btn.yes { color: var(--hsk4); }
+  .know-btn.yes:hover { background: var(--hsk4-bg); border-color: var(--hsk4); }
+  .know-btn.no { color: var(--hsk5); }
+  .know-btn.no:hover { background: var(--hsk5-bg); border-color: var(--hsk5); }
+
+  /* ── WORD LIST ── */
+  .list-toggle {
+    max-width: 680px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .list-toggle h2 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .toggle-list-btn {
+    font-size: 12px;
+    color: var(--accent);
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-weight: 500;
+    padding: 4px 8px;
+  }
+
+  .word-list {
+    max-width: 680px;
+    margin: 0 auto;
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .word-list.open { display: flex; }
+  .word-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: grid;
+    grid-template-columns: 36px 120px 1fr 80px;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: box-shadow .15s;
+  }
+  .word-row:hover { box-shadow: var(--shadow); }
+  .word-row.known { opacity: .5; }
+  .word-row-num { font-size: 12px; color: var(--ink-faint); font-weight: 500; }
+  .word-row-cn { font-family: 'Noto Serif SC', serif; font-size: 16px; font-weight: 600; }
+  .word-row-vn { font-size: 13px; color: var(--ink-soft); }
+  .word-row-tag { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; text-align: center; }
+
+  /* ── DONE SCREEN ── */
+  .done-screen {
+    display: none;
+    max-width: 680px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 48px 24px;
+  }
+  .done-screen.show { display: block; }
+  .done-icon { font-size: 48px; margin-bottom: 16px; }
+  .done-screen h2 { font-family: 'Noto Serif SC', serif; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .done-screen p { font-size: 14px; color: var(--ink-soft); margin-bottom: 24px; line-height: 1.7; }
+  .done-stats { display: flex; gap: 16px; justify-content: center; margin-bottom: 32px; }
+  .done-stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 24px; }
+  .done-stat-num { font-size: 32px; font-weight: 700; color: var(--ink); }
+  .done-stat-label { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .restart-btn {
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 0 6px;
+    transition: background .15s;
+  }
+  .restart-btn:hover { background: #2D2D4E; }
+  .restart-btn.outline {
+    background: var(--surface);
+    color: var(--ink);
+    border: 1.5px solid var(--border);
+  }
+  .restart-btn.outline:hover { border-color: var(--ink); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>工作与生活 · 闪卡练习</h1>
+    <p>HSK 4–5–6 · 20 từ vựng · Luyện phản xạ từ → nghĩa</p>
+  </div>
+  <div class="header-stats">
+    <div class="stat-pill">✓ <span id="known-count">0</span></div>
+    <div class="stat-pill">总 <span id="total-count">20</span></div>
+  </div>
+</div>
+
+<div class="filters">
+  <button class="filter-btn active" onclick="setFilter('all')">Tất cả</button>
+  <button class="filter-btn hsk4" onclick="setFilter('hsk4')">HSK 4</button>
+  <button class="filter-btn hsk5" onclick="setFilter('hsk5')">HSK 5</button>
+  <button class="filter-btn hsk6" onclick="setFilter('hsk6')">HSK 6</button>
+  <button class="filter-btn" onclick="setFilter('unknown')">Chưa thuộc</button>
+  <button class="filter-btn" onclick="shuffleCards()" style="margin-left:auto">🔀 Xáo bài</button>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="progress-label">
+    <span id="progress-text">0 / 20 từ</span>
+    <span id="progress-pct">0%</span>
+  </div>
+</div>
+
+<div class="card-scene" id="card-scene" onclick="flipCard()">
+  <div class="card-inner" id="card-inner">
+    <div class="card-face front" id="card-front">
+      <span class="card-level-tag" id="front-level">HSK 4</span>
+      <span class="card-num" id="front-num">1 / 20</span>
+      <div class="front-cn" id="front-cn">工作压力</div>
+      <div class="front-py" id="front-py">gōngzuò yālì</div>
+      <div class="front-vn" id="front-vn">áp lực công việc</div>
+      <div class="flip-hint">点击翻转 · Bấm để lật</div>
+    </div>
+    <div class="card-face back" id="card-back">
+      <span class="card-num" id="back-num">1 / 20</span>
+      <div class="back-cn" id="back-cn">工作压力</div>
+      <div class="back-py" id="back-py">gōngzuò yālì</div>
+      <div class="back-desc" id="back-desc">Áp lực trong công việc. Dùng khi nói về sự căng thẳng, gánh nặng tâm lý từ công việc.</div>
+      <div class="back-divider"></div>
+      <div class="back-example">
+        <div class="back-ex-cn" id="back-ex-cn">适当的工作压力能提高效率，但过度的压力反而会影响健康。</div>
+        <div class="back-ex-vn" id="back-ex-vn">Áp lực công việc vừa phải có thể nâng cao hiệu quả, nhưng quá mức sẽ ảnh hưởng đến sức khỏe.</div>
+      </div>
+      <div class="flip-hint">点击翻转 · Bấm để lật lại</div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="ctrl-btn" id="prev-btn" onclick="prevCard()" title="Trước">←</button>
+  <button class="ctrl-btn primary" onclick="flipCard()" title="Lật thẻ">⟳</button>
+  <button class="ctrl-btn" id="next-btn" onclick="nextCard()" title="Tiếp">→</button>
+</div>
+
+<div class="know-btns">
+  <button class="know-btn yes" onclick="markKnown(true)">✓ Thuộc rồi</button>
+  <button class="know-btn no" onclick="markKnown(false)">✗ Chưa thuộc</button>
+</div>
+
+<div class="list-toggle">
+  <h2>Danh sách từ vựng</h2>
+  <button class="toggle-list-btn" onclick="toggleList()" id="list-toggle-btn">Xem tất cả ↓</button>
+</div>
+
+<div class="word-list" id="word-list"></div>
+
+<div class="done-screen" id="done-screen">
+  <div class="done-icon">🎉</div>
+  <h2>完成了！Xong rồi!</h2>
+  <p id="done-msg">Bạn đã ôn xong tất cả thẻ trong bộ này.</p>
+  <div class="done-stats">
+    <div class="done-stat">
+      <div class="done-stat-num" id="done-known">0</div>
+      <div class="done-stat-label">Thuộc rồi ✓</div>
+    </div>
+    <div class="done-stat">
+      <div class="done-stat-num" id="done-unknown">0</div>
+      <div class="done-stat-label">Cần ôn thêm ✗</div>
+    </div>
+  </div>
+  <button class="restart-btn outline" onclick="restartUnknown()">Ôn lại từ chưa thuộc</button>
+  <button class="restart-btn" onclick="restartAll()">Ôn lại tất cả</button>
+</div>
+
+<script>
+const VOCAB = [
+  // HSK 4
+  {
+    cn:"工作压力", py:"gōngzuò yālì", vn:"áp lực công việc", level:"hsk4",
+    desc:"Áp lực trong công việc. Dùng khi nói về sự căng thẳng, gánh nặng tâm lý từ công việc.",
+    ex:"适当的工作压力能提高效率，但过度的压力反而会影响健康。",
+    exvn:"Áp lực công việc vừa phải có thể nâng cao hiệu quả, nhưng quá mức sẽ ảnh hưởng đến sức khỏe."
+  },
+  {
+    cn:"加班", py:"jiābān", vn:"làm thêm giờ", level:"hsk4",
+    desc:"Làm việc ngoài giờ quy định. Rất phổ biến trong văn hóa công sở Trung Quốc, gắn với hiện tượng 996.",
+    ex:"经常加班不一定代表工作努力，有时候反映的是效率低下的问题。",
+    exvn:"Thường xuyên làm thêm giờ không nhất thiết nghĩa là chăm chỉ – đôi khi phản ánh vấn đề hiệu quả thấp."
+  },
+  {
+    cn:"收入", py:"shōurù", vn:"thu nhập", level:"hsk4",
+    desc:"Tổng số tiền kiếm được từ công việc hoặc các nguồn khác. Rộng hơn 工资 (chỉ bao gồm lương cố định).",
+    ex:"对很多年轻人来说，收入固然重要，但工作的意义感同样不可忽视。",
+    exvn:"Với nhiều bạn trẻ, thu nhập dĩ nhiên quan trọng, nhưng ý nghĩa của công việc cũng không thể bỏ qua."
+  },
+  {
+    cn:"同事", py:"tóngshì", vn:"đồng nghiệp", level:"hsk4",
+    desc:"Người làm cùng công ty, cùng phòng ban. Khác với 朋友 (bạn bè) ở mối quan hệ công việc.",
+    ex:"职场中，与同事建立良好的信任关系往往比专业技能更难，也更重要。",
+    exvn:"Trong môi trường làm việc, xây dựng mối quan hệ tin tưởng với đồng nghiệp thường khó hơn và quan trọng hơn kỹ năng chuyên môn."
+  },
+  {
+    cn:"工资", py:"gōngzī", vn:"lương (cố định)", level:"hsk4",
+    desc:"Tiền lương cố định hàng tháng. Hẹp hơn 收入 — chỉ phần lương từ hợp đồng lao động.",
+    ex:"选择工作时，工资是重要因素，但发展空间和工作环境同样值得考虑。",
+    exvn:"Khi chọn việc làm, lương là yếu tố quan trọng, nhưng không gian phát triển và môi trường làm việc cũng đáng cân nhắc."
+  },
+  {
+    cn:"目标", py:"mùbiāo", vn:"mục tiêu", level:"hsk4",
+    desc:"Mục đích, đích nhắm đến. Dùng trong cả công việc lẫn cuộc sống. Cần cụ thể và đo được.",
+    ex:"设定目标固然重要，但更重要的是制定可执行的计划并坚持下去。",
+    exvn:"Đặt mục tiêu dĩ nhiên quan trọng, nhưng điều quan trọng hơn là lập kế hoạch có thể thực hiện được và kiên trì."
+  },
+  // HSK 5
+  {
+    cn:"职业发展", py:"zhíyè fāzhǎn", vn:"phát triển nghề nghiệp", level:"hsk5",
+    desc:"Sự tiến bộ, thăng tiến trong sự nghiệp theo thời gian. Bao gồm cả kỹ năng, vị trí và thu nhập.",
+    ex:"在规划职业发展时，了解自己的优势和市场需求同样重要。",
+    exvn:"Khi lập kế hoạch phát triển nghề nghiệp, hiểu điểm mạnh của bản thân và nhu cầu thị trường đều quan trọng như nhau."
+  },
+  {
+    cn:"工作效率", py:"gōngzuò xiàolǜ", vn:"hiệu quả làm việc", level:"hsk5",
+    desc:"Tỉ lệ kết quả đạt được so với thời gian và công sức bỏ ra. Cao = làm nhiều trong ít thời gian.",
+    ex:"提升工作效率不只是时间管理的问题，更涉及专注力的培养和任务优先级的设定。",
+    exvn:"Nâng cao hiệu quả làm việc không chỉ là vấn đề quản lý thời gian mà còn liên quan đến rèn luyện sự tập trung và xác định độ ưu tiên."
+  },
+  {
+    cn:"平衡", py:"pínghéng", vn:"cân bằng", level:"hsk5",
+    desc:"Trạng thái hài hòa giữa các yếu tố đối lập. Hay dùng trong 工作与生活的平衡 (cân bằng công việc – cuộc sống).",
+    ex:"所谓的工作与生活平衡，并不是各占50%，而是在不同阶段找到适合自己的状态。",
+    exvn:"Cân bằng công việc – cuộc sống không phải mỗi bên 50% mà là tìm được trạng thái phù hợp ở từng giai đoạn."
+  },
+  {
+    cn:"晋升", py:"jìnshēng", vn:"thăng chức", level:"hsk5",
+    desc:"Được nâng lên vị trí cao hơn trong tổ chức. Kèm theo tăng trách nhiệm và thường là tăng lương.",
+    ex:"想要晋升，不仅要有能力，还要懂得如何展示自己的价值。",
+    exvn:"Muốn thăng chức, không chỉ cần năng lực mà còn phải biết thể hiện giá trị bản thân."
+  },
+  {
+    cn:"福利", py:"fúlì", vn:"phúc lợi, đãi ngộ", level:"hsk5",
+    desc:"Các quyền lợi ngoài lương: bảo hiểm, nghỉ phép, ăn trưa, gym... Quan trọng khi đánh giá tổng thể công việc.",
+    ex:"完善的员工福利体系不仅能留住人才，更能提升整体团队的工作积极性。",
+    exvn:"Hệ thống phúc lợi nhân viên hoàn thiện không chỉ giữ chân nhân tài mà còn nâng cao động lực làm việc của toàn đội."
+  },
+  {
+    cn:"团队合作", py:"tuánduì hézuò", vn:"làm việc nhóm", level:"hsk5",
+    desc:"Phối hợp cùng nhau để đạt mục tiêu chung. Đòi hỏi giao tiếp rõ ràng, phân công hợp lý và tôn trọng lẫn nhau.",
+    ex:"有效的团队合作建立在清晰的沟通、明确的分工和相互尊重的基础上。",
+    exvn:"Làm việc nhóm hiệu quả được xây dựng trên nền tảng giao tiếp rõ ràng, phân công rõ ràng và tôn trọng lẫn nhau."
+  },
+  {
+    cn:"负责任", py:"fù zérèn", vn:"có trách nhiệm", level:"hsk5",
+    desc:"Sẵn sàng đảm nhận và hoàn thành nhiệm vụ được giao. Không đổ lỗi, không né tránh hậu quả.",
+    ex:"真正负责任的员工不只是完成任务，而是主动发现问题并提出解决方案。",
+    exvn:"Nhân viên thực sự có trách nhiệm không chỉ hoàn thành nhiệm vụ mà còn chủ động phát hiện vấn đề và đề xuất giải pháp."
+  },
+  {
+    cn:"职场竞争", py:"zhíchǎng jìngzhēng", vn:"cạnh tranh nơi công sở", level:"hsk5",
+    desc:"Sự tranh đua giữa các nhân viên về vị trí, cơ hội, nguồn lực trong môi trường làm việc.",
+    ex:"职场竞争固然带来压力，但也是推动个人成长和创新的重要动力。",
+    exvn:"Cạnh tranh nơi công sở dĩ nhiên tạo áp lực, nhưng cũng là động lực quan trọng thúc đẩy sự phát triển cá nhân và đổi mới."
+  },
+  // HSK 6
+  {
+    cn:"可持续发展", py:"kě chíxù fāzhǎn", vn:"phát triển bền vững", level:"hsk6",
+    desc:"Phát triển đáp ứng nhu cầu hiện tại mà không tổn hại đến tương lai. Dùng cho cả sự nghiệp lẫn xã hội.",
+    ex:"真正的可持续发展需要在经济效益、社会责任和个人价值之间找到平衡点。",
+    exvn:"Phát triển bền vững thực sự đòi hỏi tìm được điểm cân bằng giữa hiệu quả kinh tế, trách nhiệm xã hội và giá trị cá nhân."
+  },
+  {
+    cn:"创业", py:"chuàngyè", vn:"khởi nghiệp", level:"hsk6",
+    desc:"Tự thành lập doanh nghiệp, bắt đầu sự nghiệp kinh doanh riêng. Rủi ro cao nhưng tự do cao.",
+    ex:"创业不仅需要好的想法，更需要执行力、抗压能力以及对市场的敏锐判断。",
+    exvn:"Khởi nghiệp không chỉ cần ý tưởng hay mà còn cần năng lực thực thi, chịu đựng áp lực và nhạy bén với thị trường."
+  },
+  {
+    cn:"核心竞争力", py:"héxīn jìngzhēnglì", vn:"năng lực cạnh tranh cốt lõi", level:"hsk6",
+    desc:"Tổ hợp kỹ năng và điểm mạnh độc đáo khó bị sao chép — yếu tố tạo ra lợi thế dài hạn cho cá nhân hoặc tổ chức.",
+    ex:"一个人的核心竞争力不是单一技能，而是难以被复制的综合能力组合。",
+    exvn:"Năng lực cạnh tranh cốt lõi của một người không phải là kỹ năng đơn lẻ mà là tổ hợp năng lực tổng hợp khó bị sao chép."
+  },
+  {
+    cn:"自我实现", py:"zìwǒ shíxiàn", vn:"tự thực hiện bản thân", level:"hsk6",
+    desc:"Nhu cầu cao nhất trong tháp Maslow — phát huy hết tiềm năng bản thân, sống đúng với giá trị của mình.",
+    ex:"自我实现对我来说，就是做一份真正有意义、能发挥自己长处的工作。",
+    exvn:"Với mình, tự thực hiện bản thân là làm công việc thực sự có ý nghĩa và phát huy được điểm mạnh của mình."
+  },
+  {
+    cn:"工作与生活的边界", py:"gōngzuò yǔ shēnghuó de biānjiè", vn:"ranh giới công việc – cuộc sống", level:"hsk6",
+    desc:"Ranh giới tách biệt thời gian/không gian làm việc và cuộc sống riêng tư. Quan trọng để tránh burnout.",
+    ex:"设立清晰的工作与生活的边界，是预防职业倦怠、维持长期高效工作的关键之一。",
+    exvn:"Thiết lập ranh giới rõ ràng là chìa khóa ngăn ngừa kiệt sức nghề nghiệp và duy trì hiệu quả lâu dài."
+  },
+  {
+    cn:"内卷", py:"nèijuǎn", vn:"cạnh tranh kiệt sức (involution)", level:"hsk6",
+    desc:"Hiện tượng mọi người làm việc/học tập nhiều hơn nhưng kết quả chung không tăng. Từ hot 2020–nay, đặc biệt trong giới trẻ Trung Quốc.",
+    ex:"内卷的本质是资源有限而竞争者过多，导致每个人都付出更多却没有人真正受益。",
+    exvn:"Bản chất của 'nội quyển' là nguồn lực có hạn nhưng người cạnh tranh quá nhiều — mọi người đều nỗ lực hơn nhưng không ai thực sự được lợi."
+  }
+];
+
+let currentFilter = 'all';
+let deck = [...VOCAB];
+let currentIndex = 0;
+let knownSet = new Set();
+let isFlipped = false;
+
+function getLevelLabel(level) {
+  return level === 'hsk4' ? 'HSK 4' : level === 'hsk5' ? 'HSK 5' : 'HSK 6';
+}
+function getLevelClass(level) {
+  return `tag-${level}`;
+}
+
+function getFilteredDeck() {
+  if (currentFilter === 'all') return [...VOCAB];
+  if (currentFilter === 'unknown') return VOCAB.filter(w => !knownSet.has(w.cn));
+  return VOCAB.filter(w => w.level === currentFilter);
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  deck = getFilteredDeck();
+  currentIndex = 0;
+  isFlipped = false;
+  renderCard();
+  renderList();
+  updateProgress();
+}
+
+function shuffleCards() {
+  deck = getFilteredDeck().sort(() => Math.random() - .5);
+  currentIndex = 0;
+  isFlipped = false;
+  renderCard();
+  updateProgress();
+}
+
+function renderCard() {
+  const doneScreen = document.getElementById('done-screen');
+  const cardScene = document.getElementById('card-scene');
+  const controls = document.querySelector('.controls');
+  const knowBtns = document.querySelector('.know-btns');
+
+  if (currentIndex >= deck.length) {
+    doneScreen.classList.add('show');
+    cardScene.style.display = 'none';
+    controls.style.display = 'none';
+    knowBtns.style.display = 'none';
+    document.getElementById('done-known').textContent = knownSet.size;
+    document.getElementById('done-unknown').textContent = VOCAB.length - knownSet.size;
+    document.getElementById('done-msg').textContent =
+      `Bạn đã ôn xong ${deck.length} thẻ. Thuộc ${knownSet.size}/${VOCAB.length} từ.`;
+    return;
+  }
+
+  doneScreen.classList.remove('show');
+  cardScene.style.display = 'block';
+  controls.style.display = 'flex';
+  knowBtns.style.display = 'flex';
+
+  const w = deck[currentIndex];
+  const num = `${currentIndex + 1} / ${deck.length}`;
+  const lvl = getLevelLabel(w.level);
+  const lvlClass = getLevelClass(w.level);
+
+  document.getElementById('front-cn').textContent = w.cn;
+  document.getElementById('front-py').textContent = w.py;
+  document.getElementById('front-vn').textContent = w.vn;
+  document.getElementById('front-level').textContent = lvl;
+  document.getElementById('front-level').className = `card-level-tag ${lvlClass}`;
+  document.getElementById('front-num').textContent = num;
+  document.getElementById('back-cn').textContent = w.cn;
+  document.getElementById('back-py').textContent = w.py;
+  document.getElementById('back-desc').textContent = w.desc;
+  document.getElementById('back-ex-cn').textContent = w.ex;
+  document.getElementById('back-ex-vn').textContent = w.exvn;
+  document.getElementById('back-num').textContent = num;
+
+  // reset flip
+  isFlipped = false;
+  document.getElementById('card-inner').classList.remove('flipped');
+
+  document.getElementById('prev-btn').disabled = currentIndex === 0;
+  document.getElementById('next-btn').disabled = currentIndex >= deck.length - 1;
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('card-inner').classList.toggle('flipped', isFlipped);
+}
+
+function nextCard() {
+  if (currentIndex < deck.length - 1) {
+    currentIndex++;
+    isFlipped = false;
+    renderCard();
+    updateProgress();
+  }
+}
+
+function prevCard() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    isFlipped = false;
+    renderCard();
+    updateProgress();
+  }
+}
+
+function markKnown(known) {
+  const w = deck[currentIndex];
+  if (known) knownSet.add(w.cn);
+  else knownSet.delete(w.cn);
+  updateProgress();
+  renderList();
+  if (currentIndex < deck.length - 1) {
+    currentIndex++;
+    renderCard();
+  } else {
+    currentIndex++;
+    renderCard(); // triggers done screen
+  }
+}
+
+function updateProgress() {
+  const total = deck.length;
+  const seen = Math.min(currentIndex, total);
+  const pct = total > 0 ? Math.round((seen / total) * 100) : 0;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${seen} / ${total} từ`;
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('known-count').textContent = knownSet.size;
+  document.getElementById('total-count').textContent = VOCAB.length;
+}
+
+function renderList() {
+  const list = document.getElementById('word-list');
+  list.innerHTML = '';
+  VOCAB.forEach((w, i) => {
+    const row = document.createElement('div');
+    row.className = 'word-row' + (knownSet.has(w.cn) ? ' known' : '');
+    row.onclick = () => jumpTo(w);
+    const lvlLabel = getLevelLabel(w.level);
+    const lvlColor = w.level === 'hsk4' ? 'hsk4' : w.level === 'hsk5' ? 'hsk5' : 'hsk6';
+    row.innerHTML = `
+      <span class="word-row-num">${String(i+1).padStart(2,'0')}</span>
+      <span class="word-row-cn">${w.cn}</span>
+      <span class="word-row-vn">${w.vn}</span>
+      <span class="word-row-tag tag-${lvlColor}">${lvlLabel}</span>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function jumpTo(word) {
+  currentFilter = 'all';
+  deck = [...VOCAB];
+  currentIndex = VOCAB.findIndex(w => w.cn === word.cn);
+  if (currentIndex < 0) currentIndex = 0;
+  isFlipped = false;
+  renderCard();
+  updateProgress();
+  document.getElementById('card-scene').scrollIntoView({behavior:'smooth'});
+}
+
+function toggleList() {
+  const list = document.getElementById('word-list');
+  const btn = document.getElementById('list-toggle-btn');
+  list.classList.toggle('open');
+  btn.textContent = list.classList.contains('open') ? 'Thu gọn ↑' : 'Xem tất cả ↓';
+}
+
+function restartAll() {
+  knownSet.clear();
+  deck = [...VOCAB];
+  currentIndex = 0;
+  isFlipped = false;
+  renderCard();
+  updateProgress();
+  renderList();
+}
+
+function restartUnknown() {
+  deck = VOCAB.filter(w => !knownSet.has(w.cn));
+  if (deck.length === 0) deck = [...VOCAB];
+  currentIndex = 0;
+  isFlipped = false;
+  renderCard();
+  updateProgress();
+}
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'l') nextCard();
+  if (e.key === 'ArrowLeft' || e.key === 'j') prevCard();
+  if (e.key === ' ' || e.key === 'f') { e.preventDefault(); flipCard(); }
+  if (e.key === 'y') markKnown(true);
+  if (e.key === 'n') markKnown(false);
+});
+
+// Init
+renderCard();
+renderList();
+updateProgress();
+</script>
+</body>
+</html>
